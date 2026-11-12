@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lights Out, Orders In | Parcel Pit Wall</title>
+<style>
+  :root{
+    --teal:#00d2be;
+    --teal-dim:#0a8f84;
+    --black:#0a0b0c;
+    --carbon:#121416;
+    --panel:#171a1d;
+    --line:#262b30;
+    --silver:#c9ced3;
+    --white:#f4f6f7;
+    --muted:#8b939a;
+    --amber:#ffb020;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--black);
+    color:var(--white);
+    font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* carbon-fibre texture */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;opacity:.5;
+    background:
+      linear-gradient(27deg,#0e1012 5px,transparent 5px) 0 5px,
+      linear-gradient(207deg,#0e1012 5px,transparent 5px) 10px 0,
+      linear-gradient(27deg,#14171a 5px,transparent 5px) 0 10px,
+      linear-gradient(207deg,#14171a 5px,transparent 5px) 10px 5px,
+      linear-gradient(90deg,#101315 10px,transparent 10px),
+      linear-gradient(#131619 25%,#101315 25%,#101315 50%,transparent 50%,transparent 75%,#15181b 75%);
+    background-color:#0f1214;background-size:20px 20px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+  /* top bar */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,11,12,.88);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.14em;font-size:.85rem;text-transform:uppercase}
+  .brand .star{
+    width:30px;height:30px;border-radius:50%;
+    border:2px solid var(--silver);position:relative;
+  }
+  .brand .star::before,.brand .star::after{
+    content:"";position:absolute;left:50%;top:50%;width:2px;height:13px;background:var(--silver);
+    transform-origin:center bottom;
+  }
+  .brand .star::before{transform:translate(-50%,-100%) rotate(0deg)}
+  .brand .star::after{transform:translate(-50%,-100%) rotate(120deg)}
+  .brand .star i{position:absolute;left:50%;top:50%;width:2px;height:13px;background:var(--silver);
+    transform-origin:center bottom;transform:translate(-50%,-100%) rotate(240deg)}
+  nav a{color:var(--silver);text-decoration:none;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin-left:26px;font-weight:600;transition:color .2s}
+  nav a:hover{color:var(--teal)}
+  @media(max-width:640px){nav{display:none}}
+
+  /* hero */
+  .hero{
+    position:relative;overflow:hidden;
+    padding:90px 0 80px;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(900px 400px at 85% -10%,rgba(0,210,190,.28),transparent 60%),
+      radial-gradient(600px 300px at 0% 100%,rgba(201,206,211,.08),transparent 60%);
+  }
+  .hero::after{ /* teal speed streaks */
+    content:"";position:absolute;right:-5%;top:0;bottom:0;width:55%;
+    background:repeating-linear-gradient(115deg,transparent 0 38px,rgba(0,210,190,.07) 38px 40px);
+    pointer-events:none;
+  }
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--teal);font-size:.78rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase}
+  .eyebrow::before{content:"";width:34px;height:3px;background:var(--teal)}
+  h1{
+    font-size:clamp(2.6rem,8vw,5.8rem);line-height:.95;font-weight:900;text-transform:uppercase;
+    letter-spacing:-.01em;margin:18px 0 20px;
+  }
+  h1 span{
+    background:linear-gradient(90deg,#fff,var(--silver) 50%,#7d848a);-webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  h1 em{font-style:normal;color:var(--teal)}
+  .hero p{max-width:560px;color:var(--silver);font-size:1.05rem}
+  .hero-meta{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px}
+  .chip{
+    border:1px solid var(--line);background:rgba(23,26,29,.8);padding:8px 14px;border-radius:2px;
+    font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--silver);
+  }
+  .chip b{color:var(--teal);margin-right:6px}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:-1px}
+  .stat{background:var(--carbon);padding:26px 24px;position:relative}
+  .stat::before{content:"";position:absolute;left:0;top:0;height:3px;width:36px;background:var(--teal)}
+  .stat .k{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .stat .v{font-size:2.3rem;font-weight:900;margin-top:6px;letter-spacing:-.02em}
+  .stat .v small{font-size:.9rem;color:var(--muted);font-weight:600;margin-left:4px;letter-spacing:0}
+  @media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  section{padding:64px 0}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px}
+  .sec-head h2{font-size:1.9rem;text-transform:uppercase;font-weight:900;letter-spacing:.02em}
+  .sec-head h2::before{content:"";display:block;width:46px;height:4px;background:var(--teal);margin-bottom:12px}
+  .sec-head p{color:var(--muted);font-size:.9rem}
+
+  /* race-strip progress */
+  .grid-pos{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:800px){.grid-pos{grid-template-columns:1fr}}
+  .pos{background:var(--panel);border:1px solid var(--line);padding:22px;position:relative;overflow:hidden}
+  .pos .label{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .pos .num{font-size:3.4rem;font-weight:900;line-height:1;margin:8px 0}
+  .pos .bar{height:6px;background:#23282d;margin-top:14px;position:relative}
+  .pos .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+  .pos.p1 .num{color:var(--teal)}
+  .pos.p2 .num{color:var(--amber)}
+  .pos.p2 .bar i{background:var(--amber);box-shadow:0 0 12px var(--amber)}
+  .pos.p3 .num{color:var(--silver)}
+  .pos.p3 .bar i{background:var(--silver);box-shadow:none}
+
+  /* controls */
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:22px}
+  .controls input[type=search]{
+    flex:1 1 240px;background:var(--panel);border:1px solid var(--line);color:var(--white);
+    padding:12px 16px;font-size:.92rem;border-radius:2px;outline:none;transition:border .2s;
+  }
+  .controls input:focus{border-color:var(--teal)}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{
+    background:transparent;border:1px solid var(--line);color:var(--silver);padding:9px 14px;font-size:.74rem;
+    letter-spacing:.12em;text-transform:uppercase;font-weight:700;cursor:pointer;border-radius:2px;transition:.2s;font-family:inherit;
+  }
+  .pill:hover{border-color:var(--teal);color:var(--teal)}
+  .pill.on{background:var(--teal);border-color:var(--teal);color:#001a17}
+  .collapse-btn{
+    display:inline-flex;align-items:center;gap:10px;background:transparent;border:1px solid var(--silver);color:var(--white);
+    padding:9px 14px;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;cursor:pointer;
+    border-radius:2px;transition:.2s;font-family:inherit;
+  }
+  .collapse-btn:hover{background:var(--white);color:#0a0b0c;border-color:var(--white)}
+  .collapse-btn .chev{display:inline-block;transition:transform .25s;font-size:.8rem}
+  .collapse-btn[aria-expanded="false"] .chev{transform:rotate(-90deg)}
+  .head-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  #grid-body.collapsed,#sheet-body.collapsed{display:none}
+
+  /* order cards */
+  .orders{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--teal);
+    padding:20px;display:flex;flex-direction:column;gap:12px;transition:transform .2s,border-color .2s,box-shadow .2s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,210,190,.12);border-color:var(--teal)}
+  .card.s-packed{border-left-color:var(--amber)}
+  .card.s-ph{border-left-color:#fff}
+  .card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .badge{font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:5px 9px;border-radius:2px;white-space:nowrap}
+  .b-cust{background:rgba(0,210,190,.14);color:var(--teal);border:1px solid rgba(0,210,190,.4)}
+  .b-pack{background:rgba(255,176,32,.12);color:var(--amber);border:1px solid rgba(255,176,32,.4)}
+  .b-ph{background:#f4f6f7;color:#0a0b0c}
+  .tag{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+  .tag.me{color:var(--silver)}
+  .card h3{font-size:.98rem;line-height:1.35;font-weight:700}
+  .variant{font-size:.8rem;color:var(--muted);border-left:2px solid var(--line);padding-left:10px}
+  .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:var(--carbon);border:1px solid var(--line);padding:10px 12px}
+  .prices div span{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .prices div b{font-size:1rem}
+  .prices div:last-child b{color:var(--teal)}
+  .dates{display:flex;justify-content:space-between;font-size:.78rem;color:var(--silver)}
+  .dates span{color:var(--muted);margin-right:4px}
+  .track{font-family:Consolas,Menlo,monospace;font-size:.76rem;color:var(--silver);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .track button{
+    background:none;border:1px solid var(--line);color:var(--teal);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+    padding:3px 8px;cursor:pointer;border-radius:2px;font-family:inherit;font-weight:700;
+  }
+  .track button:hover{border-color:var(--teal)}
+  .empty{padding:40px;text-align:center;color:var(--muted);border:1px dashed var(--line);display:none}
+
+  /* parcels */
+  .parcels{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media(max-width:800px){.parcels{grid-template-columns:1fr}}
+  .parcel{background:var(--panel);border:1px solid var(--line);padding:24px}
+  .parcel .pid{font-family:Consolas,Menlo,monospace;font-size:1.15rem;color:var(--teal);font-weight:700;margin:6px 0 16px}
+  .parcel ul{list-style:none}
+  .parcel li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:.86rem;color:var(--silver)}
+  .parcel li b{color:var(--white);white-space:nowrap}
+  .parcel .sub{display:flex;justify-content:space-between;border-top:2px solid var(--teal);margin-top:6px;padding-top:12px;font-weight:800}
+
+  /* table */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);background:var(--panel)}
+  table{width:100%;border-collapse:collapse;min-width:900px;font-size:.84rem}
+  th{
+    text-align:left;background:#0d0f11;color:var(--teal);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;
+    padding:14px 14px;border-bottom:2px solid var(--teal);white-space:nowrap;
+  }
+  td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--silver)}
+  tr:hover td{background:#1b1f23}
+  td.n{color:var(--white);font-weight:600;max-width:340px}
+  tfoot td{background:#0d0f11;color:var(--white);font-weight:800;border-top:2px solid var(--teal)}
+
+  footer{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:.78rem;text-align:center;letter-spacing:.08em}
+  footer b{color:var(--teal)}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--teal);color:#001a17;font-weight:800;padding:10px 18px;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;transition:transform .3s;z-index:100}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="star"><i></i></span> Parcel Pit Wall</div>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#orders">Orders</a>
+      <a href="#parcels">Parcels</a>
+      <a href="#sheet">Full Sheet</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Parcel Pit Wall &middot; Silver Arrows Edition</div>
+    <h1><span>Lights Out,</span><br><em>Orders In</em></h1>
+    <p>Every parcel, every checkpoint. A pit-wall view of all my Pinduoduo orders &mdash; from customs clearance to the final lap home to the Philippines.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>14</b>Orders</span>
+      <span class="chip"><b>¥55.00</b>Total spend</span>
+      <span class="chip"><b>₱526.35</b>In pesos</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="stats" id="overview">
+    <div class="stat"><div class="k">Orders</div><div class="v">14</div></div>
+    <div class="stat"><div class="k">Items (qty)</div><div class="v">15</div></div>
+    <div class="stat"><div class="k">Total (CNY)</div><div class="v">¥55<small>.00</small></div></div>
+    <div class="stat"><div class="k">Total (PHP)</div><div class="v">₱526<small>.35</small></div></div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Race Status</h2>
+      <p>Where every order sits right now.</p>
+    </div>
+    <div class="grid-pos">
+      <div class="pos p1"><div class="label">P1 &middot; [CHN] Customs Complete</div><div class="num" id="n-cust">11</div><div class="label">orders cleared</div><div class="bar"><i style="width:78.6%"></i></div></div>
+      <div class="pos p2"><div class="label">P2 &middot; Packed</div><div class="num" id="n-pack">2</div><div class="label">in the pit lane</div><div class="bar"><i style="width:14.3%"></i></div></div>
+      <div class="pos p3"><div class="label">Chequered flag &middot; In Philippines</div><div class="num" id="n-ph">1</div><div class="label">arrived</div><div class="bar"><i style="width:7.1%"></i></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="orders" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>The Grid</h2>
+      <div class="head-right">
+        <p id="count-line">Showing all orders</p>
+        <button class="collapse-btn" data-target="grid-body" aria-expanded="true" aria-controls="grid-body"><span class="chev">&#9660;</span><span class="lbl">Collapse</span></button>
+      </div>
+    </div>
+    <div id="grid-body">
+    <div class="controls">
+      <input type="search" id="q" placeholder="Search orders, variants, tracking numbers...">
+      <div class="pills" id="status-pills">
+        <button class="pill on" data-s="all">All</button>
+        <button class="pill" data-s="[CHN] Customs Complete">Customs Complete</button>
+        <button class="pill" data-s="Packed">Packed</button>
+        <button class="pill" data-s="In Philippines">In Philippines</button>
+      </div>
+      <div class="pills" id="owner-pills">
+        <button class="pill on" data-o="all">Everyone</button>
+        <button class="pill" data-o="Yes">Personal</button>
+        <button class="pill" data-o="No">Not personal</button>
+      </div>
+    </div>
+    <div class="orders" id="orders-grid"></div>
+    <div class="empty" id="empty">No orders match that search.</div>
+    </div>
+  </div>
+</section>
+
+<section id="parcels" style="background:rgba(0,0,0,.35);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Shared Parcels</h2>
+      <p>Orders bundled under the same Jetscope tracking number.</p>
+    </div>
+    <div class="parcels" id="parcels-grid"></div>
+  </div>
+</section>
+
+<section id="sheet">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Full Sheet</h2>
+      <div class="head-right">
+        <p>The complete order list, as in the spreadsheet.</p>
+        <button class="collapse-btn" data-target="sheet-body" aria-expanded="true" aria-controls="sheet-body"><span class="chev">&#9660;</span><span class="lbl">Collapse</span></button>
+      </div>
+    </div>
+    <div id="sheet-body">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Version</th><th>Qty</th><th>Price</th><th>Total</th><th>PHP</th><th>Status</th><th>Ordered</th><th>ETA</th><th>Tracking</th><th>Personal</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+        <tfoot>
+          <tr><td colspan="2">Total</td><td>15</td><td></td><td>¥55.00</td><td colspan="4"></td><td colspan="2">₱526.35</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Built from the <b>PINDUODUO ORDERS</b> sheet &middot; Status as of 12 Nov 2026 &middot; Unofficial fan-style theme</div>
+</footer>
+<div class="toast" id="toast">Tracking number copied</div>
+
+<script>
+const orders = [
+ {name:"Aerobic Rhythm Pedal - Indoor Home Rehabilitation Fitness Step Stepper for Weight Loss, Children's Exercise Equipment", version:"Multi-functional Stepper [Same as gym model];Medium [Black-Red] Single-layer non-adjustable height [45*28*10CM]", qty:1, price:20.30, total:20.30, php:194.27, status:"In Philippines", order:"10/26/2026", eta:"11/26/2026", track:"910654872238", personal:"No"},
+ {name:"F1 Racing Driver Refrigerator Magnet - Same as on TV Show 'Grill Grate' - Featuring Verstappen, Leclerc, Hamilton, Russell - Personalized Design", version:"Antonelli", qty:1, price:10.08, total:10.08, php:96.47, status:"[CHN] Customs Complete", order:"10/31/2026", eta:"11/30/2026", track:"910658848060", personal:"Yes"},
+ {name:"Anti-Drop Starry Sky Glasses Anti-Slip Cover, Silicone Detachment Prevention Device with Ear Pads and Frame Fixer", version:"New Material, No Slipping: [Starry Sky Glasses Anti-Slip Cover] - Black;Ultra Soft[1 piece]", qty:1, price:2.98, total:2.98, php:28.52, status:"[CHN] Customs Complete", order:"10/31/2026", eta:"11/30/2026", track:"910665101332", personal:"Yes"},
+ {name:"F1 Driver Helmet Pan Zile Double-Sided Keychain with Buckle, Backpack Charm, Racing Support Material, Gift for Friends", version:"Antonelli [Front side has protective film];Flat 5cm acrylic [mirror image on the back] ring buckle", qty:1, price:0.56, total:0.56, php:5.36, status:"[CHN] Customs Complete", order:"11/01/2026", eta:"12/1/2026", track:"910658848060", personal:"Yes"},
+ {name:"F1-themed acrylic wireless keychain pendant - High-end aesthetic niche F1 accessory, Russell keychain", version:"Choose any two (please specify when ordering);Keychain", qty:2, price:2.56, total:5.11, php:48.90, status:"[CHN] Customs Complete", order:"10/31/2026", eta:"11/30/2026", track:"910658848060", personal:"Yes"},
+ {name:"Banana Leclerc Sticker - F1 Driver Sticker for Laptop", version:"Two pieces per pack", qty:1, price:0.21, total:0.21, php:2.01, status:"[CHN] Customs Complete", order:"11/01/2026", eta:"12/1/2026", track:"910658848060", personal:"Yes"},
+ {name:"F1 Racing Driver Kimi Antonelli High-Definition Acrylic Keychain Bag Charm Pendant", version:"Random style [No specific selection allowed];6CM single-layer double-sided", qty:1, price:0.43, total:0.43, php:4.12, status:"[CHN] Customs Complete", order:"11/01/2026", eta:"12/1/2026", track:"910658848060", personal:"Yes"},
+ {name:"Cartoon F1 Racing Helmet-Themed Flat Acrylic Brooch Pin Decoration, Creative Q-Version Gift", version:"Baby, please place an order [Style 11];F1[Brooch]", qty:1, price:1.99, total:1.99, php:19.04, status:"[CHN] Customs Complete", order:"11/02/2026", eta:"12/2/2026", track:"910658848060", personal:"Yes"},
+ {name:"No. 63 Driver Little Sel - Q-version F1 Racing Driver Chip Chew Chew Figure, Anime-style DIY Bestseller with Free Shipping", version:"-", qty:1, price:3.90, total:3.90, php:37.32, status:"[CHN] Customs Complete", order:"11/03/2026", eta:"12/3/2026", track:"910665101332", personal:"Yes"},
+ {name:"Women's Mid-Calf Socks with Bow, Autumn/Winter Trendy Lace-Trimmed Disposable Daily Wear Socks", version:"Mohawk socks [White+Oatmeal+Light Gray+Milk White+Black];Ruffle-trimmed mid-calf socks with bow [1-pair pack]", qty:1, price:0.98, total:0.98, php:9.38, status:"[CHN] Customs Complete", order:"11/03/2026", eta:"12/3/2026", track:"910665101332", personal:"Yes"},
+ {name:"Bestselling Black, White & Silver Four-Pointed Star Nail Stickers - Simple Versatile Glitter Stars with Waterproof Adhesive Backing for Nail Decoration", version:"Flat Four-pointed Star-848", qty:1, price:0.78, total:0.78, php:7.46, status:"[CHN] Customs Complete", order:"11/03/2026", eta:"12/3/2026", track:"910665101332", personal:"Yes"},
+ {name:"No. 12 Xiao Anan Racing Driver Chip, Diameter 39mm - F1 Fan Merchandise, Anime-Themed Accessory from Guzi Baji", version:"-", qty:1, price:3.90, total:3.90, php:37.32, status:"[CHN] Customs Complete", order:"11/04/2026", eta:"12/4/2026", track:"910665101332", personal:"Yes"},
+ {name:"F1 Driver Helmet Acrylic Keychain - Zhou Guanyu & Leclerc Carrying Case Pendant Collectible", version:"f1 helmet 0086 keychain;Style 4", qty:1, price:1.92, total:1.92, php:18.37, status:"Packed", order:"11/11/2026", eta:"12/11/2026", track:"", personal:"Yes"},
+ {name:"Elastic Resistance Band Combo Set - Complete Set for Strength, Chest Muscle Training, Pull-ups, and Athlete Fitness Workout", version:"WH Yellow x [Warm-Up Activation] 5-15 lbs", qty:1, price:1.86, total:1.86, php:17.80, status:"Packed", order:"11/12/2026", eta:"12/12/2026", track:"", personal:"Yes"}
+];
+
+const yen = n => "¥" + n.toFixed(2);
+const peso = n => "₱" + n.toFixed(2);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cls = s => s==="Packed" ? ["s-packed","b-pack"] : s==="In Philippines" ? ["s-ph","b-ph"] : ["","b-cust"];
+
+let fStatus="all", fOwner="all", fText="";
+
+function renderCards(){
+  const grid = document.getElementById("orders-grid");
+  const list = orders.filter(o =>
+    (fStatus==="all" || o.status===fStatus) &&
+    (fOwner==="all" || o.personal===fOwner) &&
+    (!fText || (o.name+" "+o.version+" "+o.track+" "+o.status).toLowerCase().includes(fText))
+  );
+  grid.innerHTML = list.map(o => {
+    const [cc,bc] = cls(o.status);
+    return `<article class="card ${cc}">
+      <div class="card-top"><span class="badge ${bc}">${esc(o.status)}</span><span class="tag ${o.personal==='Yes'?'me':''}">${o.personal==='Yes'?'Personal':'Not personal'}</span></div>
+      <h3>${esc(o.name)}</h3>
+      <div class="variant">${esc(o.version)}</div>
+      <div class="prices">
+        <div><span>Qty</span><b>${o.qty}</b></div>
+        <div><span>Price</span><b>${yen(o.price)}</b></div>
+        <div><span>PHP</span><b>${peso(o.php)}</b></div>
+      </div>
+      <div class="dates"><div><span>Ordered</span>${o.order}</div><div><span>ETA</span>${o.eta}</div></div>
+      <div class="track">${o.track ? `Jetscope: ${o.track} <button data-copy="${o.track}">Copy</button>` : `<span style="color:var(--muted)">Tracking not yet available</span>`}</div>
+    </article>`;
+  }).join("");
+  document.getElementById("empty").style.display = list.length ? "none" : "block";
+  document.getElementById("count-line").textContent = `Showing ${list.length} of ${orders.length} orders`;
+}
+
+document.querySelectorAll(".collapse-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const body = document.getElementById(btn.dataset.target);
+    const collapsed = body.classList.toggle("collapsed");
+    btn.setAttribute("aria-expanded", String(!collapsed));
+    btn.querySelector(".lbl").textContent = collapsed ? "Expand" : "Collapse";
+  });
+});
+
+function renderTable(){
+  document.getElementById("tbody").innerHTML = orders.map(o => `<tr>
+    <td class="n">${esc(o.name)}</td><td>${esc(o.version)}</td><td>${o.qty}</td><td>${yen(o.price)}</td><td>${yen(o.total)}</td><td>${peso(o.php)}</td>
+    <td>${esc(o.status)}</td><td>${o.order}</td><td>${o.eta}</td><td>${o.track ? "Jetscope: "+o.track : "&mdash;"}</td><td>${o.personal}</td></tr>`).join("");
+}
+
+function renderParcels(){
+  const groups = {};
+  orders.filter(o=>o.track).forEach(o => (groups[o.track] = groups[o.track]||[]).push(o));
+  document.getElementById("parcels-grid").innerHTML = Object.entries(groups)
+    .filter(([,g]) => g.length>1)
+    .sort((a,b)=>b[1].length-a[1].length)
+    .map(([id,g]) => {
+      const sub = g.reduce((s,o)=>s+o.php,0);
+      return `<div class="parcel">
+        <div class="tag">Jetscope tracking &middot; ${g.length} orders</div>
+        <div class="pid">${id}</div>
+        <ul>${g.map(o=>`<li><span>${esc(o.name.split(" - ")[0].slice(0,60))}</span><b>${peso(o.php)}</b></li>`).join("")}</ul>
+        <div class="sub"><span>Parcel value</span><span style="color:var(--teal)">${peso(sub)}</span></div>
+      </div>`;
+    }).join("");
+}
+
+document.getElementById("q").addEventListener("input", e => { fText = e.target.value.trim().toLowerCase(); renderCards(); });
+document.getElementById("status-pills").addEventListener("click", e => {
+  const b = e.target.closest(".pill"); if(!b) return;
+  document.querySelectorAll("#status-pills .pill").forEach(p=>p.classList.remove("on")); b.classList.add("on");
+  fStatus = b.dataset.s; renderCards();
+});
+document.getElementById("owner-pills").addEventListener("click", e => {
+  const b = e.target.closest(".pill"); if(!b) return;
+  document.querySelectorAll("#owner-pills .pill").forEach(p=>p.classList.remove("on")); b.classList.add("on");
+  fOwner = b.dataset.o; renderCards();
+});
+document.getElementById("orders-grid").addEventListener("click", e => {
+  const b = e.target.closest("[data-copy]"); if(!b) return;
+  const t = document.getElementById("toast");
+  const done = () => { t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1600); };
+  try { navigator.clipboard.writeText(b.dataset.copy).then(done, done); } catch(_) { done(); }
+});
+
+renderCards(); renderTable(); renderParcels();
+</script>
+</body>
+</html>
