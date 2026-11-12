@@ -112,8 +112,9 @@
   .sec-head p{color:var(--muted);font-size:.9rem}
 
   /* race-strip progress */
-  .grid-pos{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  @media(max-width:800px){.grid-pos{grid-template-columns:1fr}}
+  .grid-pos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  @media(max-width:1000px){.grid-pos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:520px){.grid-pos{grid-template-columns:minmax(0,1fr)}}
   .pos{background:var(--panel);border:1px solid var(--line);padding:22px;position:relative;overflow:hidden}
   .pos .label{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
   .pos .num{font-size:3.4rem;font-weight:900;line-height:1;margin:8px 0}
@@ -122,8 +123,10 @@
   .pos.p1 .num{color:var(--teal)}
   .pos.p2 .num{color:var(--amber)}
   .pos.p2 .bar i{background:var(--amber);box-shadow:0 0 12px var(--amber)}
-  .pos.p3 .num{color:var(--silver)}
-  .pos.p3 .bar i{background:var(--silver);box-shadow:none}
+  .pos.p3 .num{color:#6ea8ff}
+  .pos.p3 .bar i{background:#6ea8ff;box-shadow:0 0 12px #6ea8ff}
+  .pos.p4 .num{color:var(--silver)}
+  .pos.p4 .bar i{background:var(--silver);box-shadow:none}
 
   /* controls */
   .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:22px}
@@ -159,11 +162,13 @@
   .card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,210,190,.12);border-color:var(--teal)}
   .card.s-packed{border-left-color:var(--amber)}
   .card.s-ph{border-left-color:#fff}
+  .card.s-ship{border-left-color:#6ea8ff}
   .card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
   .badge{font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:5px 9px;border-radius:2px;white-space:nowrap}
   .b-cust{background:rgba(0,210,190,.14);color:var(--teal);border:1px solid rgba(0,210,190,.4)}
   .b-pack{background:rgba(255,176,32,.12);color:var(--amber);border:1px solid rgba(255,176,32,.4)}
   .b-ph{background:#f4f6f7;color:#0a0b0c}
+  .b-ship{background:rgba(110,168,255,.14);color:#6ea8ff;border:1px solid rgba(110,168,255,.45)}
   .tag{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted)}
   .tag.me{color:var(--silver)}
   .card h3{font-size:.98rem;line-height:1.35;font-weight:700}
@@ -375,11 +380,8 @@
       <h2>Race Status</h2>
       <p>Where every order sits right now.</p>
     </div>
-    <div class="grid-pos">
-      <div class="pos p1"><div class="label">P1 &middot; [CHN] Customs Complete</div><div class="num" id="n-cust">11</div><div class="label">orders cleared</div><div class="bar"><i style="width:78.6%"></i></div></div>
-      <div class="pos p2"><div class="label">P2 &middot; Packed</div><div class="num" id="n-pack">2</div><div class="label">in the pit lane</div><div class="bar"><i style="width:14.3%"></i></div></div>
-      <div class="pos p3"><div class="label">Chequered flag &middot; In Philippines</div><div class="num" id="n-ph">1</div><div class="label">arrived</div><div class="bar"><i style="width:7.1%"></i></div></div>
-    </div>
+    <div class="grid-pos" id="race-status"></div>
+  </div>
   </div>
 </section>
 
@@ -398,6 +400,7 @@
       <div class="pills" id="status-pills">
         <button class="pill on" data-s="all">All</button>
         <button class="pill" data-s="[CHN] Customs Complete">Customs Complete</button>
+        <button class="pill" data-s="Shipped">Shipped</button>
         <button class="pill" data-s="Packed">Packed</button>
         <button class="pill" data-s="In Philippines">In Philippines</button>
       </div>
@@ -417,7 +420,7 @@
   <div class="wrap">
     <div class="sec-head">
       <h2>Shared Parcels</h2>
-      <p>Orders bundled under the same Jetscope tracking number.</p>
+      <p>Orders bundled under the same tracking number.</p>
     </div>
     <div class="parcels" id="parcels-grid"></div>
   </div>
@@ -467,14 +470,16 @@ const orders = [
  {name:"Women's Mid-Calf Socks with Bow, Autumn/Winter Trendy Lace-Trimmed Disposable Daily Wear Socks", version:"Mohawk socks [White+Oatmeal+Light Gray+Milk White+Black];Ruffle-trimmed mid-calf socks with bow [1-pair pack]", qty:1, price:0.98, total:0.98, php:9.38, status:"[CHN] Customs Complete", order:"11/03/2026", eta:"12/3/2026", track:"910665101332", personal:"Yes"},
  {name:"Bestselling Black, White & Silver Four-Pointed Star Nail Stickers - Simple Versatile Glitter Stars with Waterproof Adhesive Backing for Nail Decoration", version:"Flat Four-pointed Star-848", qty:1, price:0.78, total:0.78, php:7.46, status:"[CHN] Customs Complete", order:"11/03/2026", eta:"12/3/2026", track:"910665101332", personal:"Yes"},
  {name:"No. 12 Xiao Anan Racing Driver Chip, Diameter 39mm - F1 Fan Merchandise, Anime-Themed Accessory from Guzi Baji", version:"-", qty:1, price:3.90, total:3.90, php:37.32, status:"[CHN] Customs Complete", order:"11/04/2026", eta:"12/4/2026", track:"910665101332", personal:"Yes"},
- {name:"F1 Driver Helmet Acrylic Keychain - Zhou Guanyu & Leclerc Carrying Case Pendant Collectible", version:"f1 helmet 0086 keychain;Style 4", qty:1, price:1.92, total:1.92, php:18.37, status:"Packed", order:"11/11/2026", eta:"12/11/2026", track:"", personal:"Yes"},
+ {name:"F1 Driver Helmet Acrylic Keychain - Zhou Guanyu & Leclerc Carrying Case Pendant Collectible", version:"f1 helmet 0086 keychain;Style 4", qty:1, price:1.92, total:1.92, php:18.37, status:"Shipped", order:"11/11/2026", eta:"12/11/2026", track:"J&T Express: JT5546910968076", personal:"Yes"},
  {name:"Elastic Resistance Band Combo Set - Complete Set for Strength, Chest Muscle Training, Pull-ups, and Athlete Fitness Workout", version:"WH Yellow x [Warm-Up Activation] 5-15 lbs", qty:1, price:1.86, total:1.86, php:17.80, status:"Packed", order:"11/12/2026", eta:"12/12/2026", track:"", personal:"Yes"}
 ];
 
 const yen = n => "¥" + n.toFixed(2);
 const peso = n => "₱" + n.toFixed(2);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const cls = s => s==="Packed" ? ["s-packed","b-pack"] : s==="In Philippines" ? ["s-ph","b-ph"] : ["","b-cust"];
+const cls = s => s==="Packed" ? ["s-packed","b-pack"] : s==="Shipped" ? ["s-ship","b-ship"] : s==="In Philippines" ? ["s-ph","b-ph"] : ["","b-cust"];
+const trk = o => o.track ? (o.track.includes(":") ? o.track : "Jetscope: "+o.track) : "";
+const trkNum = o => trk(o).split(": ").slice(1).join(": ");
 
 let fStatus="all", fOwner="all", fText="";
 
@@ -497,7 +502,7 @@ function renderCards(){
         <div><span>PHP</span><b>${peso(o.php)}</b></div>
       </div>
       <div class="dates"><div><span>Ordered</span>${o.order}</div><div><span>ETA</span>${o.eta}</div></div>
-      <div class="track">${o.track ? `Jetscope: ${o.track} <button data-copy="${o.track}">Copy</button>` : `<span style="color:var(--muted)">Tracking not yet available</span>`}</div>
+      <div class="track">${o.track ? `${esc(trk(o))} <button data-copy="${esc(trkNum(o))}">Copy</button>` : `<span style="color:var(--muted)">Tracking not yet available</span>`}</div>
     </article>`;
   }).join("");
   document.getElementById("empty").style.display = list.length ? "none" : "block";
@@ -516,7 +521,7 @@ document.querySelectorAll(".collapse-btn").forEach(btn => {
 function renderTable(){
   document.getElementById("tbody").innerHTML = orders.map(o => `<tr>
     <td class="n" data-label="Name">${esc(o.name)}</td><td data-label="Version">${esc(o.version)}</td><td data-label="Qty">${o.qty}</td><td data-label="Price">${yen(o.price)}</td><td data-label="Total">${yen(o.total)}</td><td data-label="PHP">${peso(o.php)}</td>
-    <td data-label="Status">${esc(o.status)}</td><td data-label="Ordered">${o.order}</td><td data-label="ETA">${o.eta}</td><td data-label="Tracking">${o.track ? "Jetscope: "+o.track : "&mdash;"}</td><td data-label="Personal">${o.personal}</td></tr>`).join("");
+    <td data-label="Status">${esc(o.status)}</td><td data-label="Ordered">${o.order}</td><td data-label="ETA">${o.eta}</td><td data-label="Tracking">${o.track ? esc(trk(o)) : "&mdash;"}</td><td data-label="Personal">${o.personal}</td></tr>`).join("");
 }
 
 function renderParcels(){
@@ -528,8 +533,8 @@ function renderParcels(){
     .map(([id,g]) => {
       const sub = g.reduce((s,o)=>s+o.php,0);
       return `<div class="parcel">
-        <div class="tag">Jetscope tracking &middot; ${g.length} orders</div>
-        <div class="pid">${id}</div>
+        <div class="tag">${esc(trk(g[0]).split(": ")[0])} tracking &middot; ${g.length} orders</div>
+        <div class="pid">${esc(trkNum(g[0]))}</div>
         <ul>${g.map(o=>`<li><span>${esc(o.name.split(" - ")[0].slice(0,60))}</span><b>${peso(o.php)}</b></li>`).join("")}</ul>
         <div class="sub"><span>Parcel value</span><span style="color:var(--teal)">${peso(sub)}</span></div>
       </div>`;
@@ -554,6 +559,19 @@ document.getElementById("orders-grid").addEventListener("click", e => {
   try { navigator.clipboard.writeText(b.dataset.copy).then(done, done); } catch(_) { done(); }
 });
 
+function renderRace(){
+  const defs = [
+    ["p1","[CHN] Customs Complete","P1 · [CHN] Customs Complete","orders cleared"],
+    ["p2","Packed","P2 · Packed","in the pit lane"],
+    ["p3","Shipped","P3 · Shipped","on the road"],
+    ["p4","In Philippines","Chequered flag · In Philippines","arrived"]
+  ];
+  document.getElementById("race-status").innerHTML = defs.map(([c,s,label,sub]) => {
+    const n = orders.filter(o=>o.status===s).length;
+    return `<div class="pos ${c}"><div class="label">${label}</div><div class="num">${n}</div><div class="label">${sub}</div><div class="bar"><i style="width:${(n/orders.length*100).toFixed(1)}%"></i></div></div>`;
+  }).join("");
+}
+
 function renderTower(){
   const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const groups = {};
@@ -572,7 +590,7 @@ function renderTower(){
   document.querySelector(".tower-foot").textContent = `${orders.length} orders · ${rows.length} arrival dates`;
 }
 
-renderCards(); renderTable(); renderParcels(); renderTower();
+renderCards(); renderTable(); renderParcels(); renderTower(); renderRace();
 </script>
 </body>
 </html>
