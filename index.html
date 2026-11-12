@@ -48,18 +48,13 @@
   }
   .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
   .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.14em;font-size:.85rem;text-transform:uppercase}
-  .brand .star{
-    width:30px;height:30px;border-radius:50%;
-    border:2px solid var(--silver);position:relative;
-  }
+  .brand .star{width:30px;height:22px;position:relative;flex:0 0 auto}
   .brand .star::before,.brand .star::after{
-    content:"";position:absolute;left:50%;top:50%;width:2px;height:13px;background:var(--silver);
-    transform-origin:center bottom;
+    content:"";position:absolute;top:0;bottom:0;width:7px;transform:skewX(-24deg);
   }
-  .brand .star::before{transform:translate(-50%,-100%) rotate(0deg)}
-  .brand .star::after{transform:translate(-50%,-100%) rotate(120deg)}
-  .brand .star i{position:absolute;left:50%;top:50%;width:2px;height:13px;background:var(--silver);
-    transform-origin:center bottom;transform:translate(-50%,-100%) rotate(240deg)}
+  .brand .star::before{left:5px;background:var(--teal)}
+  .brand .star::after{left:16px;background:var(--silver)}
+  .brand .star i{display:none}
   nav a{color:var(--silver);text-decoration:none;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin-left:26px;font-weight:600;transition:color .2s}
   nav a:hover{color:var(--teal)}
   @media(max-width:640px){nav{display:none}}
@@ -151,7 +146,7 @@
   #grid-body.collapsed,#sheet-body.collapsed{display:none}
 
   /* order cards */
-  .orders{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+  .orders{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:18px}
   .card{
     background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--teal);
     padding:20px;display:flex;flex-direction:column;gap:12px;transition:transform .2s,border-color .2s,box-shadow .2s;
@@ -208,6 +203,92 @@
   footer b{color:var(--teal)}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--teal);color:#001a17;font-weight:800;padding:10px 18px;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;transition:transform .3s;z-index:100}
   .toast.show{transform:translateX(-50%) translateY(0)}
+
+  /* ---------- responsive / mobile ---------- */
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  img,svg{max-width:100%}
+  section[id],#overview{scroll-margin-top:76px}
+  .card h3,.variant,.parcel li span{overflow-wrap:anywhere}
+  .toast{bottom:max(24px,env(safe-area-inset-bottom));max-width:90vw;text-align:center}
+  footer{padding-bottom:max(34px,env(safe-area-inset-bottom))}
+
+  @media(max-width:900px){
+    .wrap{padding:0 16px}
+    section{padding:48px 0}
+    .hero{padding:64px 0 56px}
+  }
+
+  @media(max-width:640px){
+    /* top bar: brand on top, scrollable nav underneath */
+    .topbar .wrap{height:auto;flex-wrap:wrap;padding-top:10px;padding-bottom:2px}
+    .brand{font-size:.78rem;letter-spacing:.12em}
+    nav{display:flex;order:3;width:100%;overflow-x:auto;gap:2px;margin-top:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    nav::-webkit-scrollbar{display:none}
+    nav a{margin-left:0;padding:11px 9px;white-space:nowrap;font-size:.68rem;letter-spacing:.08em}
+
+    .hero{padding:44px 0 40px}
+    .hero p{font-size:.96rem}
+    .eyebrow{font-size:.68rem;letter-spacing:.2em}
+    .eyebrow::before{width:22px}
+    .hero-meta{gap:8px;margin-top:22px}
+    .chip{padding:7px 10px;font-size:.68rem}
+
+    .stat{padding:18px 16px}
+    .stat .k{font-size:.64rem}
+    .stat .v{font-size:1.7rem}
+
+    section{padding:40px 0}
+    .sec-head{margin-bottom:18px}
+    .sec-head h2{font-size:1.5rem}
+    .head-right{width:100%;justify-content:space-between;gap:10px}
+    .collapse-btn{min-height:44px}
+
+    .pos{padding:18px}
+    .pos .num{font-size:2.6rem}
+
+    /* filters */
+    .controls{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:10px}
+    .controls input[type=search]{flex:none;width:100%;font-size:16px;min-height:46px}
+    .pills{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px;padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .pills::-webkit-scrollbar{display:none}
+    .pill{flex:0 0 auto;white-space:nowrap;min-height:44px}
+
+    /* cards */
+    .orders{grid-template-columns:minmax(0,1fr);gap:14px}
+    .card{padding:16px;min-width:0}
+    .card-top{flex-wrap:wrap}
+    .track{font-size:.72rem;overflow-wrap:anywhere}
+    .card:hover{transform:none}
+    .dates{flex-direction:column;gap:2px}
+    .track button{min-height:38px;padding:6px 14px}
+    .prices{padding:10px}
+    .prices div b{font-size:.92rem}
+
+    .parcel{padding:18px}
+    .parcel li{font-size:.82rem}
+  }
+
+  /* table becomes stacked cards on phones */
+  @media(max-width:700px){
+    .tbl-wrap{border:none;background:transparent;overflow:visible}
+    table,thead,tbody,tfoot,tr,td{display:block;min-width:0}
+    thead{display:none}
+    tbody tr{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--teal);margin-bottom:12px;padding:6px 0}
+    td{display:flex;justify-content:space-between;gap:16px;border:none;padding:8px 14px;text-align:right;overflow-wrap:anywhere}
+    td::before{content:attr(data-label);color:var(--muted);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;text-align:left;flex:0 0 34%;padding-top:2px}
+    td.n{display:block;max-width:none;text-align:left;font-size:.92rem;padding-top:12px}
+    td.n::before{display:block;margin-bottom:4px}
+    tr:hover td{background:transparent}
+    tfoot tr{background:#0d0f11;border:1px solid var(--line);border-top:2px solid var(--teal);padding:6px 0}
+    tfoot td{background:transparent;border:none}
+    tfoot td:empty{display:none}
+  }
+
+  @media(max-width:380px){
+    .stat .v{font-size:1.45rem}
+    .prices{gap:4px}
+    .prices div span{letter-spacing:.1em}
+  }
 </style>
 </head>
 <body>
@@ -317,7 +398,7 @@
         </thead>
         <tbody id="tbody"></tbody>
         <tfoot>
-          <tr><td colspan="2">Total</td><td>15</td><td></td><td>¥55.00</td><td colspan="4"></td><td colspan="2">₱526.35</td></tr>
+          <tr><td colspan="2" data-label="Sheet">Total</td><td data-label="Items">15</td><td></td><td data-label="Total (CNY)">¥55.00</td><td colspan="4"></td><td colspan="2" data-label="Total (PHP)">₱526.35</td></tr>
         </tfoot>
       </table>
     </div>
@@ -392,8 +473,8 @@ document.querySelectorAll(".collapse-btn").forEach(btn => {
 
 function renderTable(){
   document.getElementById("tbody").innerHTML = orders.map(o => `<tr>
-    <td class="n">${esc(o.name)}</td><td>${esc(o.version)}</td><td>${o.qty}</td><td>${yen(o.price)}</td><td>${yen(o.total)}</td><td>${peso(o.php)}</td>
-    <td>${esc(o.status)}</td><td>${o.order}</td><td>${o.eta}</td><td>${o.track ? "Jetscope: "+o.track : "&mdash;"}</td><td>${o.personal}</td></tr>`).join("");
+    <td class="n" data-label="Name">${esc(o.name)}</td><td data-label="Version">${esc(o.version)}</td><td data-label="Qty">${o.qty}</td><td data-label="Price">${yen(o.price)}</td><td data-label="Total">${yen(o.total)}</td><td data-label="PHP">${peso(o.php)}</td>
+    <td data-label="Status">${esc(o.status)}</td><td data-label="Ordered">${o.order}</td><td data-label="ETA">${o.eta}</td><td data-label="Tracking">${o.track ? "Jetscope: "+o.track : "&mdash;"}</td><td data-label="Personal">${o.personal}</td></tr>`).join("");
 }
 
 function renderParcels(){
