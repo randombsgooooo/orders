@@ -48,13 +48,18 @@
   }
   .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
   .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.14em;font-size:.85rem;text-transform:uppercase}
-  .brand .star{width:30px;height:22px;position:relative;flex:0 0 auto}
-  .brand .star::before,.brand .star::after{
-    content:"";position:absolute;top:0;bottom:0;width:7px;transform:skewX(-24deg);
+  .brand .star{
+    width:30px;height:30px;border-radius:50%;flex:0 0 auto;
+    border:2px solid var(--silver);position:relative;
   }
-  .brand .star::before{left:5px;background:var(--teal)}
-  .brand .star::after{left:16px;background:var(--silver)}
-  .brand .star i{display:none}
+  .brand .star::before,.brand .star::after{
+    content:"";position:absolute;left:50%;top:50%;width:2px;height:13px;background:var(--silver);
+    transform-origin:center bottom;
+  }
+  .brand .star::before{transform:translate(-50%,-100%) rotate(0deg)}
+  .brand .star::after{transform:translate(-50%,-100%) rotate(120deg)}
+  .brand .star i{position:absolute;left:50%;top:50%;width:2px;height:13px;background:var(--silver);
+    transform-origin:center bottom;transform:translate(-50%,-100%) rotate(240deg)}
   nav a{color:var(--silver);text-decoration:none;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;margin-left:26px;font-weight:600;transition:color .2s}
   nav a:hover{color:var(--teal)}
   @media(max-width:640px){nav{display:none}}
@@ -76,7 +81,7 @@
   .eyebrow{display:inline-flex;align-items:center;gap:10px;color:var(--teal);font-size:.78rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase}
   .eyebrow::before{content:"";width:34px;height:3px;background:var(--teal)}
   h1{
-    font-size:clamp(2.6rem,8vw,5.8rem);line-height:.95;font-weight:900;text-transform:uppercase;
+    font-size:clamp(2rem,6.2vw,5.2rem);line-height:.98;font-weight:900;text-transform:uppercase;
     letter-spacing:-.01em;margin:18px 0 20px;
   }
   h1 span{
@@ -205,7 +210,35 @@
   .toast.show{transform:translateX(-50%) translateY(0)}
 
   /* ---------- responsive / mobile ---------- */
-  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  /* hero two-column layout + timing tower */
+  .hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(24px,5vw,64px);align-items:center;position:relative;z-index:1}
+  .hero-copy{min-width:0}
+  .hero h1{margin:16px 0 18px}
+  .tower{
+    background:rgba(18,20,22,.86);border:1px solid var(--line);border-top:3px solid var(--teal);
+    padding:18px 20px 14px;backdrop-filter:blur(6px);box-shadow:0 20px 50px rgba(0,0,0,.45);min-width:0;
+  }
+  .tower-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}
+  .tower-head span{font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;color:var(--teal);font-weight:800}
+  .tower-head b{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--silver)}
+  .tower ol{list-style:none}
+  .tower li{display:grid;grid-template-columns:26px 62px minmax(0,1fr) 28px;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:.85rem}
+  .tower .n{width:24px;height:24px;display:grid;place-items:center;background:#23282d;color:var(--silver);font-weight:800;font-size:.72rem}
+  .tower li:first-child .n{background:var(--teal);color:#001a17}
+  .tower .d{font-weight:700;color:var(--white);white-space:nowrap}
+  .tower .bar{height:8px;background:#23282d;position:relative}
+  .tower .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--teal);box-shadow:0 0 10px rgba(0,210,190,.6)}
+  .tower li.arrived .bar i{background:#fff;box-shadow:none}
+  .tower .c{text-align:right;font-weight:800;color:var(--teal)}
+  .tower-foot{border-top:2px solid var(--line);margin-top:2px;padding-top:12px;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  @media(max-width:900px){
+    .hero-grid{grid-template-columns:minmax(0,1fr)}
+    .hero h1{font-size:clamp(2rem,10vw,4.6rem)}
+  }
+
+  /* fluid type: every rem-based size scales smoothly with the screen width */
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;font-size:clamp(12.5px,2.4vw + 5px,16px)}
+  body{overflow-wrap:break-word}
   img,svg{max-width:100%}
   section[id],#overview{scroll-margin-top:76px}
   .card h3,.variant,.parcel li span{overflow-wrap:anywhere}
@@ -222,13 +255,16 @@
     /* top bar: brand on top, scrollable nav underneath */
     .topbar .wrap{height:auto;flex-wrap:wrap;padding-top:10px;padding-bottom:2px}
     .brand{font-size:.78rem;letter-spacing:.12em}
-    nav{display:flex;order:3;width:100%;overflow-x:auto;gap:2px;margin-top:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-    nav::-webkit-scrollbar{display:none}
-    nav a{margin-left:0;padding:11px 9px;white-space:nowrap;font-size:.68rem;letter-spacing:.08em}
+    nav{display:flex;order:3;width:100%;justify-content:space-between;margin-top:4px}
+    nav a{margin-left:0;padding:11px 2px;white-space:nowrap;font-size:clamp(.58rem,2.7vw,.72rem);letter-spacing:.06em}
 
     .hero{padding:44px 0 40px}
     .hero p{font-size:.96rem}
-    .eyebrow{font-size:.68rem;letter-spacing:.2em}
+    .eyebrow{font-size:clamp(.58rem,2.8vw,.7rem);letter-spacing:.16em}
+    .brand{font-size:clamp(.66rem,3.2vw,.8rem)}
+    .sec-head h2{font-size:clamp(1.25rem,6vw,1.6rem)}
+    .stat .v{font-size:clamp(1.3rem,7vw,1.9rem)}
+    .pos .num{font-size:clamp(2rem,10vw,2.8rem)}
     .eyebrow::before{width:22px}
     .hero-meta{gap:8px;margin-top:22px}
     .chip{padding:7px 10px;font-size:.68rem}
@@ -249,9 +285,8 @@
     /* filters */
     .controls{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:10px}
     .controls input[type=search]{flex:none;width:100%;font-size:16px;min-height:46px}
-    .pills{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px;padding:0 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-    .pills::-webkit-scrollbar{display:none}
-    .pill{flex:0 0 auto;white-space:nowrap;min-height:44px}
+    .pills{flex-wrap:wrap;gap:6px}
+    .pill{flex:1 1 auto;text-align:center;min-height:42px;padding:9px 10px;font-size:clamp(.6rem,2.8vw,.74rem);letter-spacing:.08em}
 
     /* cards */
     .orders{grid-template-columns:minmax(0,1fr);gap:14px}
@@ -306,7 +341,8 @@
 </header>
 
 <div class="hero">
-  <div class="wrap">
+  <div class="wrap hero-grid">
+   <div class="hero-copy">
     <div class="eyebrow">Parcel Pit Wall &middot; Silver Arrows Edition</div>
     <h1><span>Lights Out,</span><br><em>Orders In</em></h1>
     <p>Every parcel, every checkpoint. A pit-wall view of all my Pinduoduo orders &mdash; from customs clearance to the final lap home to the Philippines.</p>
@@ -315,6 +351,12 @@
       <span class="chip"><b>¥55.00</b>Total spend</span>
       <span class="chip"><b>₱526.35</b>In pesos</span>
     </div>
+   </div>
+   <aside class="tower" aria-label="Arrivals by ETA">
+     <div class="tower-head"><span>Timing Tower</span><b>Arrivals by ETA</b></div>
+     <ol id="tower-list"></ol>
+     <div class="tower-foot">14 orders &middot; 8 arrival dates</div>
+   </aside>
   </div>
 </div>
 
@@ -512,7 +554,25 @@ document.getElementById("orders-grid").addEventListener("click", e => {
   try { navigator.clipboard.writeText(b.dataset.copy).then(done, done); } catch(_) { done(); }
 });
 
-renderCards(); renderTable(); renderParcels();
+function renderTower(){
+  const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const groups = {};
+  orders.forEach(o => {
+    const [m,d,y] = o.eta.split("/").map(Number);
+    const key = y*10000 + m*100 + d;
+    (groups[key] = groups[key] || {m,d,count:0,arrived:false});
+    groups[key].count++;
+    if (o.status==="In Philippines") groups[key].arrived = true;
+  });
+  const rows = Object.keys(groups).sort((a,b)=>a-b).map(k=>groups[k]);
+  const max = Math.max(...rows.map(r=>r.count));
+  document.getElementById("tower-list").innerHTML = rows.map((r,i)=>
+    `<li class="${r.arrived?'arrived':''}"><span class="n">${i+1}</span><span class="d">${mon[r.m-1]} ${r.d}</span><span class="bar"><i style="width:${(r.count/max)*100}%"></i></span><span class="c">${r.count}</span></li>`
+  ).join("");
+  document.querySelector(".tower-foot").textContent = `${orders.length} orders · ${rows.length} arrival dates`;
+}
+
+renderCards(); renderTable(); renderParcels(); renderTower();
 </script>
 </body>
 </html>
