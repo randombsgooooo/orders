@@ -126,6 +126,8 @@
   .pos.p3 .num{color:#6ea8ff}
   .pos.p3 .bar i{background:#6ea8ff;box-shadow:0 0 12px #6ea8ff}
   .pos.p4 .num{color:var(--silver)}
+  .pos.p5 .num{color:#b48cff}
+  .pos.p5 .bar i{background:#b48cff;box-shadow:0 0 12px #b48cff}
   .pos.p4 .bar i{background:var(--silver);box-shadow:none}
 
   /* controls */
@@ -163,11 +165,13 @@
   .card.s-packed{border-left-color:var(--amber)}
   .card.s-ph{border-left-color:#fff}
   .card.s-ship{border-left-color:#6ea8ff}
+  .card.s-phc{border-left-color:#b48cff}
   .card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
   .badge{font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:5px 9px;border-radius:2px;white-space:nowrap}
   .b-cust{background:rgba(0,210,190,.14);color:var(--teal);border:1px solid rgba(0,210,190,.4)}
   .b-pack{background:rgba(255,176,32,.12);color:var(--amber);border:1px solid rgba(255,176,32,.4)}
   .b-ph{background:#f4f6f7;color:#0a0b0c}
+  .b-phc{background:rgba(180,140,255,.14);color:#b48cff;border:1px solid rgba(180,140,255,.45)}
   .b-ship{background:rgba(110,168,255,.14);color:#6ea8ff;border:1px solid rgba(110,168,255,.45)}
   .tag{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--muted)}
   .tag.me{color:var(--silver)}
@@ -399,9 +403,10 @@
       <input type="search" id="q" placeholder="Search orders, variants, tracking numbers...">
       <div class="pills" id="status-pills">
         <button class="pill on" data-s="all">All</button>
-        <button class="pill" data-s="[CHN] Customs Complete">Customs Complete</button>
-        <button class="pill" data-s="Shipped">Shipped</button>
         <button class="pill" data-s="Packed">Packed</button>
+        <button class="pill" data-s="Shipped">Shipped</button>
+        <button class="pill" data-s="[CHN] Customs Complete">CHN Customs</button>
+        <button class="pill" data-s="[PH] Customs Complete">PH Customs</button>
         <button class="pill" data-s="In Philippines">In Philippines</button>
       </div>
       <div class="pills" id="owner-pills">
@@ -452,13 +457,13 @@
 </section>
 
 <footer>
-  <div class="wrap">Built from the <b>PINDUODUO ORDERS</b> sheet &middot; Status as of 14 Nov 2026 &middot; Unofficial fan-style theme</div>
+  <div class="wrap">Built from the <b>PINDUODUO ORDERS</b> sheet &middot; Status as of 16 Nov 2026 &middot; Unofficial fan-style theme</div>
 </footer>
 <div class="toast" id="toast">Tracking number copied</div>
 
 <script>
 const orders = [
- {name:"Aerobic Rhythm Pedal - Indoor Home Rehabilitation Fitness Step Stepper for Weight Loss, Children's Exercise Equipment", version:"Multi-functional Stepper [Same as gym model];Medium [Black-Red] Single-layer non-adjustable height [45*28*10CM]", qty:1, price:20.30, total:20.30, php:194.27, status:"In Philippines", order:"10/26/2026", eta:"11/26/2026", track:"910654872238", personal:"No"},
+ {name:"Aerobic Rhythm Pedal - Indoor Home Rehabilitation Fitness Step Stepper for Weight Loss, Children's Exercise Equipment", version:"Multi-functional Stepper [Same as gym model];Medium [Black-Red] Single-layer non-adjustable height [45*28*10CM]", qty:1, price:20.30, total:20.30, php:194.27, status:"[PH] Customs Complete", order:"10/26/2026", eta:"11/26/2026", track:"910654872238", personal:"No"},
  {name:"F1 Racing Driver Refrigerator Magnet - Same as on TV Show 'Grill Grate' - Featuring Verstappen, Leclerc, Hamilton, Russell - Personalized Design", version:"Antonelli", qty:1, price:10.08, total:10.08, php:96.47, status:"In Philippines", order:"10/31/2026", eta:"11/30/2026", track:"910658848060", personal:"Yes"},
  {name:"Anti-Drop Starry Sky Glasses Anti-Slip Cover, Silicone Detachment Prevention Device with Ear Pads and Frame Fixer", version:"New Material, No Slipping: [Starry Sky Glasses Anti-Slip Cover] - Black;Ultra Soft[1 piece]", qty:1, price:2.98, total:2.98, php:28.52, status:"In Philippines", order:"10/31/2026", eta:"11/30/2026", track:"910665101332", personal:"Yes"},
  {name:"F1 Driver Helmet Pan Zile Double-Sided Keychain with Buckle, Backpack Charm, Racing Support Material, Gift for Friends", version:"Antonelli [Front side has protective film];Flat 5cm acrylic [mirror image on the back] ring buckle", qty:1, price:0.56, total:0.56, php:5.36, status:"In Philippines", order:"11/01/2026", eta:"12/1/2026", track:"910658848060", personal:"Yes"},
@@ -470,7 +475,7 @@ const orders = [
  {name:"Women's Mid-Calf Socks with Bow, Autumn/Winter Trendy Lace-Trimmed Disposable Daily Wear Socks", version:"Mohawk socks [White+Oatmeal+Light Gray+Milk White+Black];Ruffle-trimmed mid-calf socks with bow [1-pair pack]", qty:1, price:0.98, total:0.98, php:9.38, status:"In Philippines", order:"11/03/2026", eta:"12/3/2026", track:"910665101332", personal:"Yes"},
  {name:"Bestselling Black, White & Silver Four-Pointed Star Nail Stickers - Simple Versatile Glitter Stars with Waterproof Adhesive Backing for Nail Decoration", version:"Flat Four-pointed Star-848", qty:1, price:0.78, total:0.78, php:7.46, status:"In Philippines", order:"11/03/2026", eta:"12/3/2026", track:"910665101332", personal:"Yes"},
  {name:"No. 12 Xiao Anan Racing Driver Chip, Diameter 39mm - F1 Fan Merchandise, Anime-Themed Accessory from Guzi Baji", version:"-", qty:1, price:3.90, total:3.90, php:37.32, status:"In Philippines", order:"11/04/2026", eta:"12/4/2026", track:"910665101332", personal:"Yes"},
- {name:"F1 Driver Helmet Acrylic Keychain - Zhou Guanyu & Leclerc Carrying Case Pendant Collectible", version:"f1 helmet 0086 keychain;Style 4", qty:1, price:1.92, total:1.92, php:18.37, status:"Shipped", order:"11/11/2026", eta:"12/11/2026", track:"J&T Express: JT5546910968076", personal:"Yes"},
+ {name:"F1 Driver Helmet Acrylic Keychain - Zhou Guanyu & Leclerc Carrying Case Pendant Collectible", version:"f1 helmet 0086 keychain;Style 4", qty:1, price:1.92, total:1.92, php:18.37, status:"[CHN] Customs Complete", order:"11/11/2026", eta:"12/11/2026", track:"J&T Express: JT5546910968076", personal:"Yes"},
  {name:"Elastic Resistance Band Combo Set - Complete Set for Strength, Chest Muscle Training, Pull-ups, and Athlete Fitness Workout", version:"WH Yellow x [Warm-Up Activation] 5-15 lbs", qty:1, price:1.86, total:1.86, php:17.80, status:"Shipped", order:"11/12/2026", eta:"12/12/2026", track:"ZTO Express: 79159134835886", personal:"Yes"},
  {name:"Phone, Laptop, and Tablet Camera Cover - Privacy Screen Protector for Apple Tables to Prevent Spying with Hidden Lens Cover", version:"Black;Pack of 1", qty:1, price:1.01, total:1.01, php:9.67, status:"Shipped", order:"11/13/2026", eta:"12/13/2026", track:"ZTO Express: 75159173062726", personal:"Yes"},
  {name:"Dual-use Mini Hair Straightener & Curling Iron, Portable Big Wave Styling Tool for Dorm Use, Volumizing Student Hair Styler", version:"White straightening iron comes with hair care oil", qty:1, price:0.15, total:0.15, php:1.44, status:"Shipped", order:"11/14/2026", eta:"12/14/2026", track:"YUNDA: 465860844909021", personal:"No"}
@@ -479,7 +484,7 @@ const orders = [
 const yen = n => "¥" + n.toFixed(2);
 const peso = n => "₱" + n.toFixed(2);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const cls = s => s==="Packed" ? ["s-packed","b-pack"] : s==="Shipped" ? ["s-ship","b-ship"] : s==="In Philippines" ? ["s-ph","b-ph"] : ["","b-cust"];
+const cls = s => s==="Packed" ? ["s-packed","b-pack"] : s==="Shipped" ? ["s-ship","b-ship"] : s==="[PH] Customs Complete" ? ["s-phc","b-phc"] : s==="In Philippines" ? ["s-ph","b-ph"] : ["","b-cust"];
 const trk = o => o.track ? (o.track.includes(":") ? o.track : "Jetscope: "+o.track) : "";
 const trkNum = o => trk(o).split(": ").slice(1).join(": ");
 
@@ -563,13 +568,15 @@ document.getElementById("orders-grid").addEventListener("click", e => {
 
 function renderRace(){
   const defs = [
-    ["p1","[CHN] Customs Complete","P1 · [CHN] Customs Complete","orders cleared"],
-    ["p2","Packed","P2 · Packed","in the pit lane"],
-    ["p3","Shipped","P3 · Shipped","on the road"],
-    ["p4","In Philippines","Chequered flag · In Philippines","arrived"]
+    ["p2","Packed","Packed","in the pit lane"],
+    ["p3","Shipped","Shipped","on the road"],
+    ["p1","[CHN] Customs Complete","[CHN] Customs Complete","cleared in China"],
+    ["p5","[PH] Customs Complete","[PH] Customs Complete","cleared in the Philippines"],
+    ["p4","In Philippines","Chequered flag \u00b7 In Philippines","arrived"]
   ];
   document.getElementById("race-status").innerHTML = defs.map(([c,s,label,sub]) => {
     const n = orders.filter(o=>o.status===s).length;
+    if (!n) return "";
     return `<div class="pos ${c}"><div class="label">${label}</div><div class="num">${n}</div><div class="label">${sub}</div><div class="bar"><i style="width:${(n/orders.length*100).toFixed(1)}%"></i></div></div>`;
   }).join("");
 }
